@@ -129,7 +129,7 @@
         <div id="requests-list"></div>
       </div>
       <div id="friends-section">
-        <h3 style="font-size: 16px; color: #4CAF50;">👫 Danh sách Bạn bè:</h3>
+        <h3 style="font-size: 16px; color: #4CAF50;">👫 Danh sách Bạn bè & AI Bot:</h3>
         <div id="friends-list"></div>
       </div>
     </div>
@@ -227,22 +227,25 @@
   let isLoginMode = true;
   let currentUser = localStorage.getItem('lop_user');
 
-  let users = JSON.parse(localStorage.getItem('lop_users_v8')) || {};
-  let artworks = JSON.parse(localStorage.getItem('lop_arts_v8')) || [];
-  let reports = JSON.parse(localStorage.getItem('lop_reports_v8')) || [];
-  let messages = JSON.parse(localStorage.getItem('lop_messages_v8')) || []; 
+  let users = JSON.parse(localStorage.getItem('lop_users_v7')) || {};
+  let artworks = JSON.parse(localStorage.getItem('lop_arts_v7')) || [];
+  let reports = JSON.parse(localStorage.getItem('lop_reports_v7')) || [];
+  let messages = JSON.parse(localStorage.getItem('lop_messages_v7')) || []; 
 
   let targetProfileUser = "";
   let currentChatUser = "";
 
-  // TẠO ADMIN VÀ GIÁO VIÊN MẶC ĐỊNH
+  // TẠO ADMIN, GIÁO VIÊN VÀ AI BOT MẶC ĐỊNH
   if (!users['admin@gmail.com']) {
     users['admin@gmail.com'] = { password: 'admin', fullName: 'Quản Trị Viên', nickname: 'Admin', role: 'admin', avatar: 'https://via.placeholder.com/80?text=AD', banner: '', heartsSent: [], friends: [] };
   }
   if (!users['teacher@gmail.com']) {
     users['teacher@gmail.com'] = { password: '123', fullName: 'Giáo Viên Mỹ Thuật', nickname: 'Cô Giáo', role: 'teacher', avatar: 'https://via.placeholder.com/80?text=GV', banner: '', heartsSent: [], friends: [] };
   }
-  localStorage.setItem('lop_users_v8', JSON.stringify(users));
+  if (!users['ai@gmail.com']) {
+    users['ai@gmail.com'] = { password: 'ai', fullName: 'Trợ Lý AI', nickname: 'AI Bot 🤖', role: 'ai', avatar: 'https://via.placeholder.com/80?text=AI', banner: '', heartsSent: [], friends: [] };
+  }
+  localStorage.setItem('lop_users_v7', JSON.stringify(users));
 
   window.onload = () => {
     if (localStorage.getItem('dark_mode') === 'true') document.body.classList.add('dark-mode');
@@ -296,7 +299,7 @@
       if (users[email]) return alert("Email này đã được đăng ký!");
 
       users[email] = { password: pass, fullName: fn, nickname: nn, role: 'user', avatar: 'https://via.placeholder.com/80', banner: '', heartsSent: [], friends: [] };
-      localStorage.setItem('lop_users_v8', JSON.stringify(users));
+      localStorage.setItem('lop_users_v7', JSON.stringify(users));
       alert("Đăng ký thành công!");
       toggleAuth();
     }
@@ -309,6 +312,12 @@
     const myData = users[currentUser];
     if(!myData.heartsSent) myData.heartsSent = [];
     if(!myData.friends) myData.friends = [];
+    
+    // Tự động thêm AI Bot vào danh sách bạn bè
+    if(!myData.friends.includes('ai@gmail.com') && currentUser !== 'ai@gmail.com') {
+      myData.friends.push('ai@gmail.com');
+      localStorage.setItem('lop_users_v7', JSON.stringify(users));
+    }
 
     document.getElementById('my-avatar').src = myData.avatar || 'https://via.placeholder.com/80';
     if(myData.banner) document.getElementById('my-banner').style.backgroundImage = `url(${myData.banner})`;
@@ -336,7 +345,7 @@
     if (!title || !document.getElementById('art-file').value) return alert("Nhập tên và chọn ảnh!");
     
     artworks.push({ id: Date.now(), title, image: img, authorEmail: currentUser, likes: [], dislikes: [], grade: null, comments: [] });
-    localStorage.setItem('lop_arts_v8', JSON.stringify(artworks));
+    localStorage.setItem('lop_arts_v7', JSON.stringify(artworks));
     
     alert("Đăng tranh thành công!");
     document.getElementById('art-title').value = '';
@@ -406,7 +415,7 @@
     if(!art.comments) art.comments = [];
 
     art.comments.push({ authorEmail: currentUser, text: text, time: Date.now() });
-    localStorage.setItem('lop_arts_v8', JSON.stringify(artworks));
+    localStorage.setItem('lop_arts_v7', JSON.stringify(artworks));
     loadGallery();
   }
 
@@ -416,7 +425,7 @@
     art.dislikes = art.dislikes.filter(e => e !== currentUser);
     if (art.likes.includes(currentUser)) art.likes = art.likes.filter(e => e !== currentUser);
     else art.likes.push(currentUser);
-    localStorage.setItem('lop_arts_v8', JSON.stringify(artworks));
+    localStorage.setItem('lop_arts_v7', JSON.stringify(artworks));
     loadGallery();
   }
 
@@ -426,7 +435,7 @@
     art.likes = art.likes.filter(e => e !== currentUser);
     if (art.dislikes.includes(currentUser)) art.dislikes = art.dislikes.filter(e => e !== currentUser);
     else art.dislikes.push(currentUser);
-    localStorage.setItem('lop_arts_v8', JSON.stringify(artworks));
+    localStorage.setItem('lop_arts_v7', JSON.stringify(artworks));
     loadGallery();
   }
 
@@ -438,12 +447,12 @@
     if(feedback === null) feedback = "Không có nhận xét chi tiết.";
 
     art.grade = score;
-    localStorage.setItem('lop_arts_v8', JSON.stringify(artworks));
+    localStorage.setItem('lop_arts_v7', JSON.stringify(artworks));
 
     // Gửi tin nhắn riêng cho tác giả
     let evaluationMessage = `👩‍🏫 [ĐÁNH GIÁ CỦA GIÁO VIÊN]\n🖼️ Tranh: "${art.title}"\n⭐ Điểm số: ${score}/10\n📝 Nhận xét: ${feedback}`;
     messages.push({ from: currentUser, to: art.authorEmail, text: evaluationMessage, time: Date.now() });
-    localStorage.setItem('lop_messages_v8', JSON.stringify(messages));
+    localStorage.setItem('lop_messages_v7', JSON.stringify(messages));
 
     alert("Đã chấm điểm và gửi nhận xét riêng vào hộp thư tin nhắn của tác giả thành công!");
     loadGallery();
@@ -491,7 +500,7 @@
     document.getElementById('view-banner').style.backgroundImage = `url(${u.banner || ''})`;
     document.getElementById('view-name').innerText = u.fullName;
     document.getElementById('view-nickname').innerText = "@" + u.nickname;
-    document.getElementById('view-info').innerHTML = u.role === 'teacher' ? "<b>👩‍🏫 Giáo viên</b>" : (u.role==='admin' ? "<b>🛡️ Quản trị viên</b>" : "Học sinh");
+    document.getElementById('view-info').innerHTML = u.role === 'teacher' ? "<b>👩‍🏫 Giáo viên</b>" : (u.role==='admin' ? "<b>🛡️ Quản trị viên</b>" : (u.role==='ai' ? "<b>🤖 Trợ lý AI</b>" : "Học sinh"));
 
     const actionDiv = document.getElementById('profile-actions');
     actionDiv.innerHTML = "";
@@ -515,7 +524,7 @@
 
     me.heartsSent.push(targetEmail);
 
-    if(target.heartsSent.includes(currentUser) || target.role === 'admin') {
+    if(target.heartsSent.includes(currentUser) || target.role === 'admin' || target.role === 'ai') {
       if(!me.friends.includes(targetEmail)) me.friends.push(targetEmail);
       if(!target.friends.includes(currentUser)) target.friends.push(currentUser);
       alert(`Đã kết bạn thành công với ${target.nickname}!`);
@@ -523,7 +532,7 @@
       alert("Đã thả tim! Chờ người kia thả tim lại nhé.");
     }
     
-    localStorage.setItem('lop_users_v8', JSON.stringify(users));
+    localStorage.setItem('lop_users_v7', JSON.stringify(users));
     viewProfile(targetEmail);
   }
 
@@ -603,7 +612,24 @@
     if(!text) return;
 
     messages.push({ from: currentUser, to: currentChatUser, text: text, time: Date.now() });
-    localStorage.setItem('lop_messages_v8', JSON.stringify(messages));
+    
+    // Nếu chat với AI Bot, tự động trả lời sau 1 giây
+    if (currentChatUser === 'ai@gmail.com') {
+      setTimeout(() => {
+        const aiReplies = [
+          "Bức tranh của bạn có phong cách rất sáng tạo và độc đáo đấy! 🎨✨",
+          "Góc nhìn nghệ thuật rất tốt. Thử pha thêm chút màu tương phản xem sao nhé?",
+          "Mình đánh giá cao ý tưởng này! Bạn có muốn gợi ý chủ đề vẽ cho tuần tới không? 🤖",
+          "Tuyệt vời! Nét cọ ngày càng có hồn hơn rồi đó. Cứ phát huy nha! 🚀"
+        ];
+        let reply = aiReplies[Math.floor(Math.random() * aiReplies.length)];
+        messages.push({ from: 'ai@gmail.com', to: currentUser, text: reply, time: Date.now() });
+        localStorage.setItem('lop_messages_v7', JSON.stringify(messages));
+        if(currentChatUser === 'ai@gmail.com') renderMessages();
+      }, 1000);
+    }
+
+    localStorage.setItem('lop_messages_v7', JSON.stringify(messages));
     input.value = '';
     renderMessages();
   }
@@ -614,14 +640,14 @@
     const reason = document.getElementById('report-reason').value;
     if(!reason) return alert("Vui lòng ghi lý do!");
     reports.push({ from: users[currentUser].nickname, target: users[targetProfileUser].nickname, reason: reason });
-    localStorage.setItem('lop_reports_v8', JSON.stringify(reports));
+    localStorage.setItem('lop_reports_v7', JSON.stringify(reports));
     alert("Đã gửi tố cáo!"); document.getElementById('report-reason').value = ''; closeModal('report-modal');
   }
   function saveMyProfile() {
     users[currentUser].nickname = document.getElementById('edit-nickname').value;
     users[currentUser].avatar = document.getElementById('my-avatar').src;
     users[currentUser].banner = document.getElementById('my-banner').dataset.src || users[currentUser].banner;
-    localStorage.setItem('lop_users_v8', JSON.stringify(users)); alert("Đã lưu!"); loadGallery();
+    localStorage.setItem('lop_users_v7', JSON.stringify(users)); alert("Đã lưu!"); loadGallery();
   }
   function toggleTheme() {
     document.body.classList.toggle('dark-mode');
