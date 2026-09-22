@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mạng Xã Hội Mỹ Thuật Lớp Học</title>
+  <title> triễn lãm Mỹ Thuật </title>
   <style>
     body { font-family: sans-serif; background: #e9ecef; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; transition: background 0.3s; }
     #app { width: 100%; max-width: 400px; height: 90vh; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); overflow: hidden; position: relative; display: flex; flex-direction: column; transition: background 0.3s, color 0.3s; }
@@ -57,8 +57,8 @@
     .comment-input-wrap button { width: auto; padding: 0 12px; font-size: 12px; }
 
     /* Bạn bè & Chat */
-    .friend-card { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 10px; margin-bottom: 10px; }
-    .friend-info { display: flex; align-items: center; gap: 10px; font-weight: bold; cursor: pointer;}
+    .friend-card { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 10px; margin-bottom: 10px; cursor: pointer;}
+    .friend-info { display: flex; align-items: center; gap: 10px; font-weight: bold;}
     .friend-info img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover;}
 
     .chat-container { background: white; width: 100%; height: 100%; display: flex; flex-direction: column; position: absolute; top:0; left:0;}
@@ -124,15 +124,16 @@
       <div id="ranking-container"></div>
     </div>
 
-    <!-- Tab 3: Bạn bè & Tin nhắn -->
+    <!-- Tab 3: Bạn bè, Theo dõi & Tin nhắn -->
     <div id="tab-messages" class="page">
-      <h2>💬 Bạn Bè & Nhắn Tin</h2>
-      <div id="pending-requests" style="margin-bottom: 20px;">
-        <h3 style="font-size: 16px; color: #ff4757;">❤️ Ai đó đã thả tim bạn:</h3>
-        <div id="requests-list"></div>
-      </div>
+      <h2>🔍 Tìm Kiếm & Nhắn Tin</h2>
+      
+      <!-- Thanh tìm kiếm người dùng -->
+      <input type="text" id="search-user-input" placeholder="🔍 Tìm kiếm người dùng bằng biệt danh..." oninput="handleSearchUser()" style="margin-bottom:15px; border-radius: 20px;">
+      <div id="search-results" style="margin-bottom: 20px;"></div>
+
       <div id="friends-section">
-        <h3 style="font-size: 16px; color: #4CAF50;">👫 Danh sách Bạn bè:</h3>
+        <h3 style="font-size: 16px; color: #4CAF50;">👥 Những người bạn đang theo dõi:</h3>
         <div id="friends-list"></div>
       </div>
     </div>
@@ -169,15 +170,27 @@
         <input type="text" id="edit-nickname" placeholder="Biệt danh mới...">
         <button onclick="saveMyProfile()" style="background:#007bff; margin-bottom:20px;">Lưu Thay Đổi</button>
       </div>
+      
+      <!-- Khu vực Đổi Mật Khẩu -->
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #eee;">
+        <h4 style="margin-top:0; color:#555;">🔒 Đổi Mật Khẩu</h4>
+        <input type="password" id="old-pwd" placeholder="Mật khẩu cũ hiện tại...">
+        <input type="password" id="new-pwd" placeholder="Mật khẩu mới...">
+        <button onclick="changePassword()" style="background:#ff9800;">Xác Nhận Đổi Mật Khẩu</button>
+      </div>
+
       <div class="settings-actions">
         <button onclick="toggleTheme()" class="theme-btn">🌙 Bật/Tắt Giao diện Tối</button>
         <button onclick="logout()" class="logout-btn">🚪 Đăng Xuất</button>
       </div>
+
+      <!-- Bảng Admin -->
       <div id="admin-panel" style="display:none; margin-top:20px; background:#fff3cd; padding:15px; border-radius:10px; color:black; border: 1px solid #ffeeba;">
         <h3>🛡️ Bảng Điều Khiển Quản Trị Viên</h3>
         <button onclick="showReports()" style="background:#e65100; margin-bottom: 10px;">Xem Danh Sách Tố Cáo</button>
         <div id="admin-reports"></div>
-        <h4 style="margin-top: 15px;">👥 Quản Lý Người Dùng (Khóa/Mở Khóa Tài Khoản):</h4>
+        <h4 style="margin-top: 15px;">👥 Quản Lý Người Dùng:</h4>
+        <input type="text" id="admin-search-user-input" placeholder="🔍 Tìm kiếm tài khoản để khóa/mở khóa..." oninput="loadAdminUsersList()" style="margin-bottom:10px;">
         <div id="admin-users-list"></div>
       </div>
     </div>
@@ -186,13 +199,13 @@
     <div class="bottom-nav">
       <div class="nav-item active" onclick="switchTab('home', this)">🏠<br>Nhà</div>
       <div class="nav-item" onclick="switchTab('ranking', this)">🏆<br>Top 7</div>
-      <div class="nav-item" onclick="switchTab('messages', this)">💬<br>Chat</div>
+      <div class="nav-item" onclick="switchTab('messages', this)">🔍<br>Chat</div>
       <div class="nav-item" id="nav-action-btn" onclick="switchTab('action', this)">➕<br>Nộp</div>
       <div class="nav-item" onclick="switchTab('settings', this)">⚙️<br>Setting</div>
     </div>
   </div>
 
-  <!-- MODAL: Xem Hồ Sơ & Kết Bạn -->
+  <!-- MODAL: Xem Hồ Sơ & Theo dõi -->
   <div id="profile-modal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal('profile-modal')">✖</span>
@@ -203,8 +216,11 @@
         <h3 id="view-name" style="margin-top:40px; margin-bottom:5px;">Tên</h3>
         <p id="view-nickname" style="color:gray; margin-top:0;">@bietdanh</p>
         <p id="view-info"></p>
-        <div id="profile-actions" style="margin-top: 15px;"></div>
-        <button onclick="openReportModal()" class="report-btn">🚨 Tố cáo</button>
+        <p id="view-stats" style="font-size:14px; font-weight:bold; color:#007bff;"></p>
+        
+        <div id="profile-actions" style="margin-top: 15px; display: flex; gap: 10px;"></div>
+        
+        <button onclick="openReportModal()" class="report-btn">🚨 Tố cáo vi phạm</button>
       </div>
     </div>
   </div>
@@ -240,22 +256,30 @@
   let isLoginMode = true;
   let currentUser = localStorage.getItem('lop_user');
 
-  let users = JSON.parse(localStorage.getItem('lop_users_v9')) || {};
-  let artworks = JSON.parse(localStorage.getItem('lop_arts_v9')) || [];
-  let reports = JSON.parse(localStorage.getItem('lop_reports_v9')) || [];
-  let messages = JSON.parse(localStorage.getItem('lop_messages_v9')) || []; 
+  // Lấy dữ liệu hoặc chuyển đổi từ bản cũ lên bản v10
+  let oldUsers = JSON.parse(localStorage.getItem('lop_users_v9')) || {};
+  let users = JSON.parse(localStorage.getItem('lop_users_v10')) || oldUsers;
+  let artworks = JSON.parse(localStorage.getItem('lop_arts_v10')) || JSON.parse(localStorage.getItem('lop_arts_v9')) || [];
+  let reports = JSON.parse(localStorage.getItem('lop_reports_v10')) || JSON.parse(localStorage.getItem('lop_reports_v9')) || [];
+  let messages = JSON.parse(localStorage.getItem('lop_messages_v10')) || JSON.parse(localStorage.getItem('lop_messages_v9')) || []; 
 
   let targetProfileUser = "";
   let currentChatUser = "";
 
   // TẠO ADMIN VÀ GIÁO VIÊN MẶC ĐỊNH
   if (!users['admin@gmail.com']) {
-    users['admin@gmail.com'] = { password: 'admin', fullName: 'Quản Trị Viên', nickname: 'Admin', role: 'admin', avatar: 'https://via.placeholder.com/80?text=AD', banner: '', heartsSent: [], friends: [], isBanned: false };
+    users['admin@gmail.com'] = { password: 'admin', fullName: 'Quản Trị Viên', nickname: 'Admin', role: 'admin', avatar: 'https://via.placeholder.com/80?text=AD', banner: '', following: [], followers: [], isBanned: false };
   }
   if (!users['teacher@gmail.com']) {
-    users['teacher@gmail.com'] = { password: '123', fullName: 'Giáo Viên Mỹ Thuật', nickname: 'Cô Giáo', role: 'teacher', avatar: 'https://via.placeholder.com/80?text=GV', banner: '', heartsSent: [], friends: [], isBanned: false };
+    users['teacher@gmail.com'] = { password: '123', fullName: 'Giáo Viên Mỹ Thuật', nickname: 'Cô Giáo', role: 'teacher', avatar: 'https://via.placeholder.com/80?text=GV', banner: '', following: [], followers: [], isBanned: false };
   }
-  localStorage.setItem('lop_users_v9', JSON.stringify(users));
+
+  // Cập nhật cấu trúc Follow cho các tài khoản cũ
+  Object.keys(users).forEach(k => {
+    if(!users[k].followers) users[k].followers = [];
+    if(!users[k].following) users[k].following = users[k].friends || []; // Chuyển danh sách bạn bè cũ thành following
+  });
+  localStorage.setItem('lop_users_v10', JSON.stringify(users));
 
   window.onload = () => {
     if (localStorage.getItem('dark_mode') === 'true') document.body.classList.add('dark-mode');
@@ -317,11 +341,24 @@
       if (!fn || !nn) return alert("Nhập đủ họ tên và biệt danh!");
       if (users[email]) return alert("Email này đã được đăng ký!");
 
-      users[email] = { password: pass, fullName: fn, nickname: nn, role: 'user', avatar: 'https://via.placeholder.com/80', banner: '', heartsSent: [], friends: [], isBanned: false };
-      localStorage.setItem('lop_users_v9', JSON.stringify(users));
+      users[email] = { password: pass, fullName: fn, nickname: nn, role: 'user', avatar: 'https://via.placeholder.com/80', banner: '', following: [], followers: [], isBanned: false };
+      localStorage.setItem('lop_users_v10', JSON.stringify(users));
       alert("Đăng ký thành công!");
       toggleAuth();
     }
+  }
+
+  function changePassword() {
+    let oldP = document.getElementById('old-pwd').value;
+    let newP = document.getElementById('new-pwd').value;
+    if(oldP !== users[currentUser].password) return alert("Mật khẩu cũ không chính xác!");
+    if(!newP) return alert("Vui lòng nhập mật khẩu mới!");
+    
+    users[currentUser].password = newP;
+    localStorage.setItem('lop_users_v10', JSON.stringify(users));
+    alert("Đổi mật khẩu thành công!");
+    document.getElementById('old-pwd').value = '';
+    document.getElementById('new-pwd').value = '';
   }
 
   function showMainScreen() {
@@ -329,9 +366,6 @@
     document.getElementById('main-screen').style.display = 'flex';
     
     const myData = users[currentUser];
-    if(!myData.heartsSent) myData.heartsSent = [];
-    if(!myData.friends) myData.friends = [];
-
     document.getElementById('my-avatar').src = myData.avatar || 'https://via.placeholder.com/80';
     if(myData.banner) document.getElementById('my-banner').style.backgroundImage = `url(${myData.banner})`;
     document.getElementById('edit-nickname').value = myData.nickname;
@@ -358,7 +392,11 @@
     
     if (tabId === 'home') loadGallery();
     if (tabId === 'ranking') loadRanking();
-    if (tabId === 'messages') loadFriendsTab();
+    if (tabId === 'messages') {
+      document.getElementById('search-user-input').value = '';
+      document.getElementById('search-results').innerHTML = '';
+      loadFriendsTab();
+    }
     if (tabId === 'action' && users[currentUser].role === 'teacher') loadTeacherUngradedList();
   }
 
@@ -368,7 +406,7 @@
     if (!title || !document.getElementById('art-file').value) return alert("Nhập tên và chọn ảnh!");
     
     artworks.push({ id: Date.now(), title, image: img, authorEmail: currentUser, likes: [], dislikes: [], grade: null, comments: [] });
-    localStorage.setItem('lop_arts_v9', JSON.stringify(artworks));
+    localStorage.setItem('lop_arts_v10', JSON.stringify(artworks));
     
     alert("Đăng tranh thành công!");
     document.getElementById('art-title').value = '';
@@ -376,10 +414,11 @@
     switchTab('home', document.querySelectorAll('.nav-item')[0]);
   }
 
+  // Chức năng xóa bài viết (Cho phép Tác giả và Admin)
   function deleteArt(id) {
-    if(!confirm("Bạn có chắc chắn muốn xóa bức tranh này không?")) return;
+    if(!confirm("Bạn có chắc chắn muốn xóa bài viết này không? (Hành động này không thể hoàn tác)")) return;
     artworks = artworks.filter(a => a.id !== id);
-    localStorage.setItem('lop_arts_v9', JSON.stringify(artworks));
+    localStorage.setItem('lop_arts_v10', JSON.stringify(artworks));
     loadGallery();
     loadRanking();
     if(users[currentUser].role === 'teacher') loadTeacherUngradedList();
@@ -397,10 +436,10 @@
       
       let gradeDisplay = art.grade ? `<div class="grade-badge">Điểm: ${art.grade}/10</div>` : '';
       
-      // Nút xóa bài (Chủ nhân bài viết hoặc Admin được phép xóa)
+      // Nút xóa bài (Chỉ hiện cho Người đăng bài HOẶC Quản trị viên)
       let deleteBtn = '';
       if(art.authorEmail === currentUser || users[currentUser].role === 'admin') {
-        deleteBtn = `<button onclick="deleteArt(${art.id})" style="background:#ff4757; margin-top:8px; padding:6px; font-size:12px;">🗑️ Xóa bài viết này</button>`;
+        deleteBtn = `<button onclick="deleteArt(${art.id})" style="background:#ff4757; margin-top:8px; padding:8px; font-size:13px;">🗑️ Xóa bài viết này</button>`;
       }
 
       let commentsHTML = '';
@@ -444,13 +483,11 @@
     const input = document.getElementById(`comment-input-${artId}`);
     const text = input.value.trim();
     if(!text) return;
-
     let art = artworks.find(a => a.id === artId);
     if(!art) return;
     if(!art.comments) art.comments = [];
-
     art.comments.push({ authorEmail: currentUser, text: text, time: Date.now() });
-    localStorage.setItem('lop_arts_v9', JSON.stringify(artworks));
+    localStorage.setItem('lop_arts_v10', JSON.stringify(artworks));
     loadGallery();
   }
 
@@ -460,7 +497,7 @@
     art.dislikes = art.dislikes.filter(e => e !== currentUser);
     if (art.likes.includes(currentUser)) art.likes = art.likes.filter(e => e !== currentUser);
     else art.likes.push(currentUser);
-    localStorage.setItem('lop_arts_v9', JSON.stringify(artworks));
+    localStorage.setItem('lop_arts_v10', JSON.stringify(artworks));
     loadGallery();
   }
 
@@ -470,20 +507,17 @@
     art.likes = art.likes.filter(e => e !== currentUser);
     if (art.dislikes.includes(currentUser)) art.dislikes = art.dislikes.filter(e => e !== currentUser);
     else art.dislikes.push(currentUser);
-    localStorage.setItem('lop_arts_v9', JSON.stringify(artworks));
+    localStorage.setItem('lop_arts_v10', JSON.stringify(artworks));
     loadGallery();
   }
 
-  // Dành riêng cho Giáo Viên chấm điểm
   function loadTeacherUngradedList() {
     const container = document.getElementById('teacher-ungraded-list');
     container.innerHTML = artworks.length ? '' : '<p style="color:gray;">Chưa có bức tranh nào được nộp.</p>';
-
     [...artworks].reverse().forEach(art => {
       const u = users[art.authorEmail];
       const nickname = u ? u.nickname : "Ẩn danh";
       let statusBadge = art.grade ? `<b style="color:green;">Đã chấm: ${art.grade}/10</b>` : `<b style="color:orange;">Chưa chấm điểm</b>`;
-
       container.innerHTML += `
         <div class="art-card" style="border: 2px dashed #9c27b0;">
           <img src="${art.image}" style="height: 180px; object-fit: cover;">
@@ -502,20 +536,16 @@
     if(score === null) return;
     let feedback = prompt("Nhập lời nhận xét chi tiết (sẽ gửi vào hộp thư tin nhắn của học sinh):");
     if(feedback === null) feedback = "Không có nhận xét chi tiết.";
-
     art.grade = score;
-    localStorage.setItem('lop_arts_v9', JSON.stringify(artworks));
-
+    localStorage.setItem('lop_arts_v10', JSON.stringify(artworks));
     let evaluationMessage = `👩‍🏫 [ĐÁNH GIÁ CỦA GIÁO VIÊN]\n🖼️ Tranh: "${art.title}"\n⭐ Điểm số: ${score}/10\n📝 Nhận xét: ${feedback}`;
     messages.push({ from: currentUser, to: art.authorEmail, text: evaluationMessage, time: Date.now() });
-    localStorage.setItem('lop_messages_v9', JSON.stringify(messages));
-
+    localStorage.setItem('lop_messages_v10', JSON.stringify(messages));
     alert("Đã chấm điểm và gửi nhận xét cho học sinh thành công!");
     loadGallery();
     if(users[currentUser].role === 'teacher') loadTeacherUngradedList();
   }
 
-  // Bảng Xếp Hạng Top 7
   function loadRanking() {
     const container = document.getElementById('ranking-container');
     container.innerHTML = '';
@@ -527,10 +557,9 @@
     });
 
     sorted.slice(0, 7).forEach((art, idx) => {
-      if(art.likes.length === 0 && idx >= 3) return; // Chỉ hiện top có tương tác hoặc tối đa 7
+      if(art.likes.length === 0 && idx >= 3) return; 
       let medal = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣', '7️⃣'][idx]; 
       const u = users[art.authorEmail];
-      
       container.innerHTML += `
         <div class="rank-card" onclick="viewProfile('${art.authorEmail}')">
           <div class="rank-num">${medal}</div>
@@ -552,89 +581,94 @@
     const me = users[currentUser];
     targetProfileUser = email;
     
-    if(!u.heartsSent) u.heartsSent = [];
-    if(!u.friends) u.friends = [];
-    
     document.getElementById('view-avatar').src = u.avatar || 'https://via.placeholder.com/80';
     document.getElementById('view-banner').style.backgroundImage = `url(${u.banner || ''})`;
     document.getElementById('view-name').innerText = u.fullName;
     document.getElementById('view-nickname').innerText = "@" + u.nickname;
     document.getElementById('view-info').innerHTML = u.role === 'teacher' ? "<b>👩‍🏫 Giáo viên Mỹ Thuật</b>" : (u.role==='admin' ? "<b>🛡️ Quản trị viên</b>" : "Học sinh");
+    document.getElementById('view-stats').innerText = `${u.followers.length} Người theo dõi | Đang theo dõi ${u.following.length}`;
 
     const actionDiv = document.getElementById('profile-actions');
     actionDiv.innerHTML = "";
 
     if(email !== currentUser) {
-      if(me.friends.includes(email)) {
-        actionDiv.innerHTML = `<button onclick="openChat('${email}')" style="background:#007bff;">💬 Nhắn tin</button>`;
-      } else {
-        let isHearted = me.heartsSent.includes(email);
-        let btnText = isHearted ? "Đã Thả Tim ❤️" : "❤️ Thả tim để kết bạn";
-        let btnColor = isHearted ? "#ff4757" : "#ff7675";
-        actionDiv.innerHTML = `<button onclick="sendHeart('${email}')" style="background:${btnColor};" ${isHearted?'disabled':''}>${btnText}</button>`;
-      }
+      let isFollowing = me.following.includes(email);
+      let btnText = isFollowing ? "Đang theo dõi ✔️" : "Theo dõi ➕";
+      let btnColor = isFollowing ? "#6c757d" : "#ff4757";
+      
+      actionDiv.innerHTML = `
+        <button onclick="toggleFollow('${email}')" style="background:${btnColor}; flex:1;">${btnText}</button>
+        <button onclick="openChat('${email}')" style="background:#007bff; flex:1;">💬 Nhắn tin</button>
+      `;
     }
     document.getElementById('profile-modal').style.display = 'flex';
   }
 
-  function sendHeart(targetEmail) {
-    const me = users[currentUser];
-    const target = users[targetEmail];
-
-    me.heartsSent.push(targetEmail);
-
-    if(target.heartsSent.includes(currentUser) || target.role === 'admin') {
-      if(!me.friends.includes(targetEmail)) me.friends.push(targetEmail);
-      if(!target.friends.includes(currentUser)) target.friends.push(currentUser);
-      alert(`Đã kết bạn thành công với ${target.nickname}!`);
+  function toggleFollow(targetEmail) {
+    let me = users[currentUser];
+    let target = users[targetEmail];
+    
+    if(me.following.includes(targetEmail)) {
+      me.following = me.following.filter(e => e !== targetEmail);
+      target.followers = target.followers.filter(e => e !== currentUser);
     } else {
-      alert("Đã thả tim! Chờ người kia thả tim lại nhé.");
+      me.following.push(targetEmail);
+      target.followers.push(currentUser);
     }
     
-    localStorage.setItem('lop_users_v9', JSON.stringify(users));
-    viewProfile(targetEmail);
+    localStorage.setItem('lop_users_v10', JSON.stringify(users));
+    viewProfile(targetEmail); // Tải lại modal
+    if(document.getElementById('tab-messages').classList.contains('active')) loadFriendsTab();
+  }
+
+  // Chức năng Tìm Kiếm Người Dùng chung (Tab Chat)
+  function handleSearchUser() {
+    let keyword = document.getElementById('search-user-input').value.toLowerCase().trim();
+    let resultsDiv = document.getElementById('search-results');
+    resultsDiv.innerHTML = '';
+    
+    if(!keyword) return;
+
+    let count = 0;
+    Object.keys(users).forEach(email => {
+      let u = users[email];
+      if(email !== currentUser && (u.nickname.toLowerCase().includes(keyword) || u.fullName.toLowerCase().includes(keyword))) {
+        count++;
+        resultsDiv.innerHTML += `
+          <div class="friend-card" onclick="viewProfile('${email}')" style="background:#e3f2fd; border-color:#90caf9;">
+            <div class="friend-info">
+              <img src="${u.avatar}">
+              <span>${u.nickname} <small style="color:gray;">(${u.fullName})</small></span>
+            </div>
+            <button style="width:auto; padding:5px 10px; background:#007bff;">Xem Hồ Sơ</button>
+          </div>
+        `;
+      }
+    });
+    if(count === 0) resultsDiv.innerHTML = '<p style="font-size:13px; color:gray;">Không tìm thấy tài khoản nào.</p>';
   }
 
   function loadFriendsTab() {
     const me = users[currentUser];
-    const reqList = document.getElementById('requests-list');
     const frList = document.getElementById('friends-list');
-    reqList.innerHTML = ''; frList.innerHTML = '';
+    frList.innerHTML = '';
 
-    let hasReq = false;
     let hasFr = false;
-
-    Object.keys(users).forEach(email => {
-      if(email === currentUser) return;
-      const u = users[email];
-      
-      if(u.heartsSent && u.heartsSent.includes(currentUser) && !me.heartsSent.includes(email) && !me.friends.includes(email)) {
-        hasReq = true;
-        reqList.innerHTML += `
-          <div class="friend-card">
-            <div class="friend-info" onclick="viewProfile('${email}')">
-              <img src="${u.avatar}">
-              <span>${u.nickname}</span>
-            </div>
-            <button onclick="sendHeart('${email}'); switchTab('messages', document.querySelectorAll('.nav-item')[2])" style="background:#ff4757; width:auto; padding:5px 10px;">Thả tim lại ❤️</button>
-          </div>`;
-      }
-
-      if(me.friends.includes(email)) {
-        hasFr = true;
-        frList.innerHTML += `
-          <div class="friend-card">
-            <div class="friend-info" onclick="viewProfile('${email}')">
-              <img src="${u.avatar}">
-              <span>${u.nickname}</span>
-            </div>
-            <button onclick="openChat('${email}')" style="background:#007bff; width:auto; padding:5px 15px;">Chat 💬</button>
-          </div>`;
-      }
+    me.following.forEach(email => {
+      if(!users[email]) return;
+      hasFr = true;
+      let u = users[email];
+      frList.innerHTML += `
+        <div class="friend-card" onclick="viewProfile('${email}')">
+          <div class="friend-info">
+            <img src="${u.avatar}">
+            <span>${u.nickname}</span>
+          </div>
+          <button onclick="event.stopPropagation(); openChat('${email}')" style="background:#007bff; width:auto; padding:5px 15px;">Chat 💬</button>
+        </div>`;
     });
 
-    if(!hasReq) reqList.innerHTML = "<p style='font-size:13px; color:gray;'>Không có lời mời nào.</p>";
-    if(!hasFr) frList.innerHTML = "<p style='font-size:13px; color:gray;'>Chưa có bạn bè.</p>";
+    if(!hasFr) frList.innerHTML = "<p style='font-size:13px; color:gray;'>Bạn chưa theo dõi ai.</p>";
   }
 
   function openChat(email) {
@@ -671,18 +705,24 @@
     if(!text) return;
 
     messages.push({ from: currentUser, to: currentChatUser, text: text, time: Date.now() });
-    localStorage.setItem('lop_messages_v9', JSON.stringify(messages));
+    localStorage.setItem('lop_messages_v10', JSON.stringify(messages));
     input.value = '';
     renderMessages();
   }
 
-  // Quản lý Ban / Mở khóa tài khoản của Admin
+  // Quản lý Ban / Mở khóa tài khoản của Admin (Kèm tìm kiếm)
   function loadAdminUsersList() {
+    let keyword = document.getElementById('admin-search-user-input').value.toLowerCase().trim();
     const container = document.getElementById('admin-users-list');
     container.innerHTML = '';
+
     Object.keys(users).forEach(email => {
-      if(email === currentUser) return;
+      if(email === currentUser) return; // Không hiển thị chính Admin đang online
       let u = users[email];
+      
+      // Lọc theo từ khóa tìm kiếm
+      if(keyword && !u.nickname.toLowerCase().includes(keyword) && !email.toLowerCase().includes(keyword)) return;
+
       let statusText = u.isBanned ? '<span style="color:red;">Đã khóa</span>' : '<span style="color:green;">Hoạt động</span>';
       let btnText = u.isBanned ? 'Mở khóa' : 'Khóa (Ban)';
       let btnColor = u.isBanned ? '#28a745' : '#dc3545';
@@ -699,7 +739,7 @@
   function toggleBanUser(email) {
     if(users[email].role === 'admin') return alert("Không thể khóa tài khoản Admin khác!");
     users[email].isBanned = !users[email].isBanned;
-    localStorage.setItem('lop_users_v9', JSON.stringify(users));
+    localStorage.setItem('lop_users_v10', JSON.stringify(users));
     loadAdminUsersList();
     alert(`Đã thay đổi trạng thái tài khoản ${email}`);
   }
@@ -710,14 +750,14 @@
     const reason = document.getElementById('report-reason').value;
     if(!reason) return alert("Vui lòng ghi lý do!");
     reports.push({ from: users[currentUser].nickname, target: users[targetProfileUser].nickname, reason: reason });
-    localStorage.setItem('lop_reports_v9', JSON.stringify(reports));
+    localStorage.setItem('lop_reports_v10', JSON.stringify(reports));
     alert("Đã gửi tố cáo!"); document.getElementById('report-reason').value = ''; closeModal('report-modal');
   }
   function saveMyProfile() {
     users[currentUser].nickname = document.getElementById('edit-nickname').value;
     users[currentUser].avatar = document.getElementById('my-avatar').src;
     users[currentUser].banner = document.getElementById('my-banner').dataset.src || users[currentUser].banner;
-    localStorage.setItem('lop_users_v9', JSON.stringify(users)); alert("Đã lưu!"); loadGallery();
+    localStorage.setItem('lop_users_v10', JSON.stringify(users)); alert("Đã lưu!"); loadGallery();
   }
   function toggleTheme() {
     document.body.classList.toggle('dark-mode');
